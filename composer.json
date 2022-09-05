@@ -1,0 +1,17 @@
+{
+    "name": "s_kholman/pdf_parser",
+    "autoload": {
+        "psr-4": {
+            "SKholman\\PdfParser\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sergey",
+            "email": "uporovo@mail.ru"
+        }
+    ],
+    "require": {
+        "smalot/pdfparser": "^2.2"
+    }
+}
