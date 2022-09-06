@@ -1,9 +1,37 @@
+<form method="post" action="index.php" enctype="multipart/form-data">
+    <label for="inputfile"></label>
+    <input type="file" id="inputfile" name="inputfile" accept="application/pdf"></br>
+    <input type="submit" value="Загрузить" name='load'>
+</form>
+<form action="index.php" method="post">
+    <p><b>Внесите или исправьте лимиты:</b></p>
+    <p><textarea  rows="10" cols="60" name="text"><?=file_get_contents('limit.txt')?></textarea></p>
+    <p><input type="submit" value="Отправить" name="save"></p>
+</form>
 <?php
 require_once 'vendor/autoload.php';
+$parser = new \Smalot\PdfParser\Parser();
+if (isset($_POST['load']) and (!empty($_FILES['inputfile']['tmp_name']))) {
+    $pdf = $parser->parseFile($_FILES['inputfile']['tmp_name']);
+    }
+else{
+    $pdf = $parser->parseFile('document.pdf');
+}
+
+if (isset($_POST['save'])) {
+    // Открыть текстовый файл
+    $f = fopen("limit.txt", "w");
+// Записать текст
+    fwrite($f, $_POST['text']);
+// Закрыть текстовый файл
+    fclose($f);
+    header("Location: ".$_SERVER['REQUEST_URI']);
+}
+
 $i = 0;
 $it = [];
-$parser = new \Smalot\PdfParser\Parser();
-$pdf = $parser->parseFile('document.pdf');
+
+
 $text = $pdf->getText();
 $a = 0;
 $b = 0;
@@ -47,11 +75,11 @@ asort($lines);
     if(array_key_exists($phone, $it)){
         echo '<tr>';
         echo '<td align="right">'. $i++ . '</td>' . '<td >' .$FIO . '</td>' . '<td align="center" width="150">' . $phone . '</td>' . '<td align="center" width="50">' . $limit . '</td> ' . '<td align="center" width="75">' .$it[$phone] . '</td>';
-        if ($limit-$it[$phone] >= 0){
+        if ((float)$limit-(float)$it[$phone] >= 0){
             echo '<td align="center" width="50"></td></tr>';
         }
         else {
-            echo '<td align="center" width="50" style="color: red">' . ($limit-$it[$phone])*-1 .'</td></tr>';
+            echo '<td align="center" width="50" style="color: red">' . ((float)$limit-(float)$it[$phone])*-1 .'</td></tr>';
         }
         unset($it[$phone]);
     }
